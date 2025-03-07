@@ -52,6 +52,31 @@
       <div id="bottomSection" class="mt-4">
         <div class="text-center">
           <button id="bingoButton" class="btn btn-success btn-lg rounded-0" onclick="resetGame()" disabled>Bingo!</button>
+        
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-primary btn-lg rounded-0" data-bs-toggle="modal" data-bs-target="#exampleModalCenter">
+            Show QR code
+          </button>
+
+          <!-- Modal -->
+          <div class="modal fade rounded-0" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header rounded-0">
+                  <h5 class="modal-title" id="exampleModalLongTitle">Scan Me</h5>
+                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <img src="qr.png"  width="200px" alt="qr-code-scan-it">
+                </div>
+                <div class="modal-footer rounded-0">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -128,7 +153,7 @@
       document.getElementById('bingoButton').disabled = true; // Disable Bingo button again
     }
   </script>
-
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

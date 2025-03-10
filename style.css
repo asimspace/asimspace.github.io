@@ -2,6 +2,10 @@
     --jumbotron-padding-y: 3rem;
   }
 
+  main{
+    padding-top: 50px;
+  }
+
   .jumbotron {
     padding-top: var(--jumbotron-padding-y);
     padding-bottom: var(--jumbotron-padding-y);
@@ -32,10 +36,19 @@
     align-items: center;
   }
 
+  .bingo-numbers-holder{
+    font-size: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .bingo-numbers-holder {
+      font-size: 2.6rem;
+    }
+  }
+
 
   footer {
-    padding-top: 3rem;
-    padding-bottom: 3rem;
+    padding-bottom: 1rem;
   }
 
   footer p {
@@ -44,8 +57,16 @@
 
   .box-shadow { box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05); }
 
-  @include media-breakpoint-up(lg) {
-    html {
-      font-size: 2.6rem;
-    }
+
+  /* Style Bingo Card */
+  #bingo-card{
+    border-color: #000;
+  }
+  #bingo-card thead td{
+    font-weight: bold;
+  }
+  #bingo-card tr td{
+    cursor: pointer;
+    padding: 1.5rem 0.5rem;
+    font-size: 1.5rem;
   }

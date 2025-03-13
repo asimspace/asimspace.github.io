@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
 
 const BingoGenerator = () => {
-    const [generatedNumbers, setGeneratedNumbers] = useState([]);
+    const [generatedNumbers, setGeneratedNumbers] = useState(() => {
+        const savedNumbers = localStorage.getItem('generatedNumbers');
+        return savedNumbers ? JSON.parse(savedNumbers) : [];
+    });
     const [isGenerating, setIsGenerating] = useState(false);
+
+    useEffect(() => {
+        localStorage.setItem('generatedNumbers', JSON.stringify(generatedNumbers));
+    }, [generatedNumbers]);
   
     const startGenerating = () => {
       setIsGenerating(true);
@@ -28,6 +35,7 @@ const BingoGenerator = () => {
 
     const resetNumber = () => {
         setGeneratedNumbers([]);
+        localStorage.removeItem('generatedNumbers');
     };
 
   return (

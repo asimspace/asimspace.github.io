@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 const Board = () => {
     const [boardNumbers, setBoardNumbers] = useState({});
@@ -33,7 +34,7 @@ const Board = () => {
           // Skip the center square for the "N" column (row 2)
           const cellKey = `${col}-${row}`;
           if (col === 'N' && row === 2) {
-            rowCells.push(<td key={cellKey} className="text-center font-weight-bold align-middle">X</td>);
+            rowCells.push(<td key={cellKey} className="text-center font-weight-bold align-middle bg-secondary-subtle">X</td>);
           } else {
             const isClicked = clickedCells[cellKey];
             rowCells.push(
@@ -78,24 +79,27 @@ const Board = () => {
 
     return (
       <div className="container text-center my-5 pt-5">
-          <div className="row">
-              <div className="col">
-                  <table id="bingo-card" className={`table table-bordered table-responsive-sm mx-auto ${tableClass}`} style={{maxWidth: '90%'}}>
-                      <thead>
-                          <tr>
-                              <td className="text-primary ">B</td>
-                              <td className="text-success ">I</td>
-                              <td className="text-danger ">N</td>
-                              <td className="text-warning ">G</td>
-                              <td className="text-dark ">O</td>
-                          </tr>
-                      </thead>
-                      <tbody>
-                      {boardRows}
-                      </tbody>
-                  </table>
-              </div>
+        <Helmet>
+          <title>Bingo Card - Player</title>
+        </Helmet>
+        <div className="row">
+          <div className="col">
+            <table id="bingo-card" className={`table table-bordered table-responsive-sm mx-auto ${tableClass}`} style={{maxWidth: '90%'}}>
+              <thead>
+                <tr>
+                  <td className="text-primary ">B</td>
+                  <td className="text-success ">I</td>
+                  <td className="text-danger ">N</td>
+                  <td className="text-warning ">G</td>
+                  <td className="text-dark ">O</td>
+                </tr>
+              </thead>
+              <tbody>
+              {boardRows}
+              </tbody>
+            </table>
           </div>
+        </div>
       </div>
     );
 };

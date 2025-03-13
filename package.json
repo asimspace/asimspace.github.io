@@ -1,7 +1,7 @@
 {
-  "name": "react-bingo",
+  "name": "asimspace.github.io",
   "version": "0.1.0",
-  "homepage" :"https://asimspace.github.io",
+  "homepage": "https://asimspace.github.io",
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
@@ -12,6 +12,7 @@
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0",
+    "react-helmet-async": "^2.0.5",
     "react-router-dom": "^7.3.0",
     "react-scripts": "5.0.1",
     "styled-components": "^6.1.15",

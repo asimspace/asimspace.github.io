@@ -1,6 +1,7 @@
 // pages/Home.js
 import { useState } from "react";
-import { Badge, Button, Spinner } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
+import { Helmet } from "react-helmet-async";
 
 const Home = () => {
     const [generatedNumbers, setGeneratedNumbers] = useState([]);
@@ -32,6 +33,9 @@ const Home = () => {
 
   return (
     <div className="container text-center my-5 pt-5">
+        <Helmet>
+          <title>Free Bingo Number Generator - Home </title>
+        </Helmet>
         <div className="row">
             <div className="col">
                 <Button id="generateButton" onClick={startGenerating} className="btn btn-primary btn-lg rounded-0" disabled={isGenerating}>

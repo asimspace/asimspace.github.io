@@ -1,0 +1,18 @@
+#bingoNumbers{font-size: 1.5rem;}
+@media (min-width: 768px) {
+  #bingoNumbers {
+      font-size: 2.6rem;
+  }
+}
+/* Style Bingo Card */
+#bingo-card{
+  border-color: #000;
+}
+#bingo-card thead td{
+  font-weight: bold;
+}
+#bingo-card tr td{
+  cursor: pointer;
+  padding: 1.5rem 0.5rem;
+  font-size: 1.5rem;
+}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
-const Board = () => {
+const BingoCard = () => {
     const [boardNumbers, setBoardNumbers] = useState({});
     const [boardRows, setBoardRows] = useState([]);
     const [clickedCells, setClickedCells] = useState({});
@@ -104,4 +104,4 @@ const Board = () => {
     );
 };
 
-export default Board;
+export default BingoCard;

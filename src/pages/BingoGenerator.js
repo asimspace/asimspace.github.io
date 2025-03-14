@@ -8,6 +8,7 @@ const BingoGenerator = () => {
         return savedNumbers ? JSON.parse(savedNumbers) : [];
     });
     const [isGenerating, setIsGenerating] = useState(false);
+    const [fadingOut, setFadingOut] = useState(false);
 
     useEffect(() => {
         localStorage.setItem('generatedNumbers', JSON.stringify(generatedNumbers));
@@ -34,8 +35,16 @@ const BingoGenerator = () => {
     };
 
     const resetNumber = () => {
-        setGeneratedNumbers([]);
-        localStorage.removeItem('generatedNumbers');
+        setFadingOut(true);
+        generatedNumbers.forEach((_, index) => {
+        setTimeout(() => {
+            setGeneratedNumbers(prevNumbers => prevNumbers.slice(0, -1));
+            if (index === generatedNumbers.length - 1) {
+            setFadingOut(false);
+            localStorage.removeItem('generatedNumbers');
+            }
+        }, index * 100);
+        });
     };
 
   return (

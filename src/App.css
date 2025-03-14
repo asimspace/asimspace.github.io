@@ -5,6 +5,10 @@
       min-height: 66px;
   }
 }
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.1s ease-out;
+}
 /* Style Bingo Card */
 #bingo-card{
   border-color: #000;

@@ -1,27 +1,90 @@
-#bingoNumbers{font-size: 1.5rem;}
+/* Ensure consistent font size for bingo numbers */
+#bingoNumbers {
+  font-size: 1.5rem;
+}
+
 @media (min-width: 768px) {
   #bingoNumbers {
-      font-size: 2.6rem;
-      min-height: 66px;
+    font-size: 2.6rem;
+    min-height: 66px;
   }
 }
+
+/* Fade-in animation */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+  -webkit-animation: fadeIn 0.5s forwards; /* Safari & older browsers */
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Fade-out effect */
 .fade-out {
   opacity: 0;
   transition: opacity 0.1s ease-out;
+  -webkit-transition: opacity 0.1s ease-out;
+  -moz-transition: opacity 0.1s ease-out;
+  -o-transition: opacity 0.1s ease-out;
 }
+
 /* Style Bingo Card */
-#bingo-card{
-  border-color: #000;
-  border: 10px solid;
+#bingo-card {
+  border: 10px solid #000;
+  border-collapse: collapse; /* Ensures no gaps between table borders */
+  width: 100%;
+  max-width: 90%;
+  margin: auto;
 }
+
+/* Style for individual bingo cells */
 .bingo-cell {
   transition: background-color 0.3s ease-in-out, text-decoration 0.1s ease-in-out;
+  -webkit-transition: background-color 0.3s ease-in-out, text-decoration 0.1s ease-in-out;
+  -moz-transition: background-color 0.3s ease-in-out, text-decoration 0.1s ease-in-out;
+  -o-transition: background-color 0.3s ease-in-out, text-decoration 0.1s ease-in-out;
 }
-#bingo-card thead td{
+
+#bingo-card thead td {
   font-weight: bold;
+  text-align: center;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 3px solid #000;
 }
-#bingo-card tr td{
+
+/* Bingo card cells */
+#bingo-card tr td {
   cursor: pointer;
   padding: 1.5rem 0.5rem;
   font-size: 1.5rem;
+  text-align: center;
+  vertical-align: middle;
+  border: 2px solid #000;
+  transition: background-color 0.3s ease, text-decoration 0.1s ease-in-out;
+}
+
+/* Ensure proper tap/click behavior on touch devices */
+@media (hover: none) {
+  #bingo-card tr td {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+}
+
+/* Ensure accessibility improvements */
+#bingo-card tr td:focus {
+  outline: 3px solid #007bff;
 }

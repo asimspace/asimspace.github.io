@@ -73,7 +73,7 @@ const BingoGenerator = () => {
                         O: "bg-dark text-white"
                     }[num.charAt(0)];
                     return (
-                        <span key={index} className={`d-inline px-1 fw-light ${badgeClass}`}>{num}</span>
+                        <span key={index} className={`d-inline px-1 fw-light ${badgeClass} ${fadingOut ? '' : 'fade-in'}`}>{num}</span>
                     );
                     })}
                 </div>

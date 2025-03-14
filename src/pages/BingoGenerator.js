@@ -45,13 +45,10 @@ const BingoGenerator = () => {
         </Helmet>
         <div className="row">
             <div className="col">
-                <Button id="generateButton" onClick={startGenerating} className="btn btn-primary btn-lg rounded-0" disabled={isGenerating}>
+                <Button id="generateButton" onClick={startGenerating} className="btn btn-primary btn-lg rounded-0 fw-light" disabled={isGenerating}>
                 {isGenerating ? (
                     <>
-                      <Spinner animation="border" role="status" size="sm" className="me-2">
-                          <span className="visually-hidden">Loading...</span>
-                      </Spinner>
-                      Generating...
+                      <Spinner animation="grow" size="sm" /> Generating
                     </>
                 ) : (
                     "Generate a Number"

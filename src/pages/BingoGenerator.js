@@ -55,10 +55,10 @@ const BingoGenerator = () => {
                 <Button id="generateButton" onClick={startGenerating} className="btn btn-primary btn-lg rounded-0 fw-light" disabled={isGenerating}>
                 {isGenerating ? (
                     <>
-                      <Spinner animation="grow" size="sm" /> Generating
+                      <Spinner animation="grow" size="sm" /> Picking
                     </>
                 ) : (
-                    "Generate a Number"
+                    "Pick a Number"
                 )}
                 </Button>
                 <div id="bingoNumbers" className="my-5 d-flex flex-wrap justify-content-center gap-1 mt-4">

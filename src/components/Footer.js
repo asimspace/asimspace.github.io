@@ -1,9 +1,15 @@
+import { Container, Row, Col } from "react-bootstrap";
+
 const Footer = () => (
-    <footer className="text-muted">
+    <footer>
         <hr/>
-        <div class="container">
-            <p>&copy; Bingo 2025. Enjoy Responsibly!</p>
-        </div>
+        <Container>
+            <Row>
+                <Col>
+                    <p>&copy; Bingo 2025. Enjoy Responsibly! </p>
+                </Col>
+            </Row>
+        </Container>
     </footer>
   );
   

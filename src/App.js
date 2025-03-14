@@ -10,22 +10,25 @@ import About from "./pages/About";
 import BingoCard from "./pages/BingoCard";
 import QRModal from "./components/QRModal";
 import { HelmetProvider } from "react-helmet-async";
+import BingoGuide from "./components/BingoGuide";
 
 const App = () => {
   const [modalShow, setModalShow] = useState(false);
+  const [offCanvasShow, setOffCanvasShow] = useState(false);
 
   return (
     <HelmetProvider>
       <Router>
         <Header showModal={() => setModalShow(true)} />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home showOffCanvas={() => setOffCanvasShow(true)}/>} />
           <Route path="/about" element={<About />} />
           <Route path="/play-bingo" element={<PlayBingo />} />
           <Route path="/bingo-card" element={<BingoCard />} />
         </Routes>
         <Footer />
         <QRModal show={modalShow} onHide={() => setModalShow(false)} />
+        <BingoGuide show={offCanvasShow} hide={() => setOffCanvasShow(false)} />
       </Router>
     </HelmetProvider>
   );

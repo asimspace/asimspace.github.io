@@ -22,16 +22,14 @@ const BingoGenerator = () => {
     const generateBingoNumber = () => {
       setIsGenerating(false);
       const bingoLetters = ['B', 'I', 'N', 'G', 'O'];
-      const letter = bingoLetters[Math.floor(Math.random() * bingoLetters.length)];
-      const number = Math.floor(Math.random() * 15) + 1 + (bingoLetters.indexOf(letter) * 15);
-      const bingoNumber = `${letter}- ${number}`;
+      let bingoNumber;
+      do {
+        const letter = bingoLetters[Math.floor(Math.random() * bingoLetters.length)];
+        const number = Math.floor(Math.random() * 15) + 1 + (bingoLetters.indexOf(letter) * 15);
+        bingoNumber = `${letter}-${number}`;
+      } while (generatedNumbers.includes(bingoNumber));
   
-      setGeneratedNumbers(prevNumbers => {
-        if (!prevNumbers.includes(bingoNumber)) {
-          return [...prevNumbers, bingoNumber];
-        }
-        return prevNumbers;
-      });
+      setGeneratedNumbers(prevNumbers => [...prevNumbers, bingoNumber]);
     };
 
     const resetNumber = () => {

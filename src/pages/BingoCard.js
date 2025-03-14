@@ -34,13 +34,13 @@ const BingoCard = () => {
           // Skip the center square for the "N" column (row 2)
           const cellKey = `${col}-${row}`;
           if (col === 'N' && row === 2) {
-            rowCells.push(<td key={cellKey} className="text-center font-weight-bold align-middle bg-secondary-subtle">X</td>);
+            rowCells.push(<td key={cellKey} className="text-center font-weight-bold text-danger align-middle bg-secondary-subtle">★</td>);
           } else {
             const isClicked = clickedCells[cellKey];
             rowCells.push(
               <td 
                 key={cellKey} 
-                className={`text-center align-middle ${isClicked ? 'bg-secondary-subtle' : ''}`} 
+                className={`text-center align-middle bingo-cell ${isClicked ? 'bg-secondary-subtle' : ''}`} 
                 style={{ textDecoration: isClicked ? 'line-through' : 'none' }}
                 onClick={() => handleCellClick(cellKey)}
               >

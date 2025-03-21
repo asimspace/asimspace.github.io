@@ -88,3 +88,36 @@
 #bingo-card tr td:focus {
   outline: 3px solid #007bff;
 }
+/* Slide-in animation */
+@keyframes slideIn {
+  from {
+      transform: translateX(100%);
+      opacity: 0;
+  }
+  to {
+      transform: translateX(0);
+      opacity: 1;
+  }
+}
+
+/* Slide-out animation */
+@keyframes slideOut {
+  from {
+      transform: translateX(0);
+      opacity: 1;
+  }
+  to {
+      transform: translateX(100%);
+      opacity: 0;
+  }
+}
+
+/* Apply slide-in animation */
+.slide-in {
+  animation: slideIn 0.5s forwards;
+}
+
+/* Apply slide-out animation */
+.slide-out {
+  animation: slideOut 0.5s forwards;
+}

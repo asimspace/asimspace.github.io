@@ -7,6 +7,7 @@ const BingoCard = () => {
     const [clickedCells, setClickedCells] = useState({});
     const [tableClass, setTableClass] = useState('');
     const [showAlert, setShowAlert] = useState(true);
+    const [alertClass, setAlertClass] = useState('slide-in');
 
     useEffect(() => {
       const columns = {
@@ -19,9 +20,14 @@ const BingoCard = () => {
       setBoardNumbers(columns);
       setTableClass(getRandomTableClass());
 
+      // Show the alert with a delay of 0.5s
+      setTimeout(() => setShowAlert(true), 500);
+
       // Automatically fade out the alert after 5 seconds
-      const timer = setTimeout(() => setShowAlert(false), 5000);
-      return () => clearTimeout(timer); 
+      const timer = setTimeout(() => {
+          setAlertClass('slide-out'); // Trigger slide-out animation
+          setTimeout(() => setShowAlert(false), 500); // Remove alert after animation
+      }, 5500);
     }, []);
 
     useEffect(() => {
@@ -90,7 +96,7 @@ const BingoCard = () => {
         {/* Bootstrap Alert */}
         {showAlert && (
           <div 
-            className="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3" 
+            className={`alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3 ${alertClass}`} 
             role="alert" 
             style={{ zIndex: 1050 }}
           >

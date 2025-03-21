@@ -6,6 +6,7 @@ const BingoCard = () => {
     const [boardRows, setBoardRows] = useState([]);
     const [clickedCells, setClickedCells] = useState({});
     const [tableClass, setTableClass] = useState('');
+    const [showAlert, setShowAlert] = useState(true);
 
     useEffect(() => {
       const columns = {
@@ -17,6 +18,10 @@ const BingoCard = () => {
       };
       setBoardNumbers(columns);
       setTableClass(getRandomTableClass());
+
+      // Automatically fade out the alert after 5 seconds
+      const timer = setTimeout(() => setShowAlert(false), 5000);
+      return () => clearTimeout(timer); 
     }, []);
 
     useEffect(() => {
@@ -82,6 +87,22 @@ const BingoCard = () => {
         <Helmet>
           <title>Bingo Card - Player</title>
         </Helmet>
+        {/* Bootstrap Alert */}
+        {showAlert && (
+          <div 
+            className="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3" 
+            role="alert" 
+            style={{ zIndex: 1050 }}
+          >
+            Good Luck!
+            <button 
+              type="button" 
+              className="btn-close" 
+              aria-label="Close" 
+              onClick={() => setShowAlert(false)}
+            ></button>
+          </div>
+        )}
         <div className="row">
           <div className="col">
             <table id="bingo-card" className={`table table-bordered table-responsive-sm mx-auto ${tableClass}`} style={{maxWidth: '90%'}}>

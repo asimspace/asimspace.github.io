@@ -20,15 +20,15 @@ const BingoGuide = ({ show, hide }) => (
       <Link className="btn btn-primary btn-xs rounded-0" to="/play-bingo">Bingo Number Picker!</Link></p>
 
       <h3 className="lead">3️⃣ Mark Your Card  </h3>
-      <p>- If the announced number is on your card, mark it (use a marker or chips).</p>
+      <p>- If the announced number is on your card, click it! (The number will strike-through and you will notice a dark background on selected number.).</p>
 
       <h3 className="lead">4️⃣ Win by Completing a Pattern </h3>
       <p>
         - You win if you mark 5 in a row (horizontal, vertical, or diagonal). <br/> 
-        - Some games have special patterns like a full card (blackout).</p>  
+        - Some games have special patterns like a full card (blackout). It's upto you guys to decide what pattern you wanna play.</p>  
 
       <h3 className="lead">5️⃣ Shout <b>"Bingoooo!"</b>  </h3>
-      <p>- If you complete a pattern, yell "Bingo!" before the next number is called.  <br/>
+      <p>- If you complete a pattern, yell "BINGO!" before the next number is called.  <br/>
       - The game host checks your card to confirm. </p> 
 
       <h3 className="lead">6️⃣ Claim Your Prize 🎁  </h3>

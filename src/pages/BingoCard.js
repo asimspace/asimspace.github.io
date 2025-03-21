@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import Alert from '../components/Alert';
 
 const BingoCard = () => {
     const [boardNumbers, setBoardNumbers] = useState({});
@@ -7,7 +8,6 @@ const BingoCard = () => {
     const [clickedCells, setClickedCells] = useState({});
     const [tableClass, setTableClass] = useState('');
     const [showAlert, setShowAlert] = useState(true);
-    const [alertClass, setAlertClass] = useState('slide-in');
 
     useEffect(() => {
       const columns = {
@@ -19,15 +19,6 @@ const BingoCard = () => {
       };
       setBoardNumbers(columns);
       setTableClass(getRandomTableClass());
-
-      // Show the alert with a delay of 0.5s
-      setTimeout(() => setShowAlert(true), 500);
-
-      // Automatically fade out the alert after 5 seconds
-      const timer = setTimeout(() => {
-          setAlertClass('slide-out'); // Trigger slide-out animation
-          setTimeout(() => setShowAlert(false), 500); // Remove alert after animation
-      }, 5500);
     }, []);
 
     useEffect(() => {
@@ -93,22 +84,16 @@ const BingoCard = () => {
         <Helmet>
           <title>Bingo Card - Player</title>
         </Helmet>
+        
         {/* Bootstrap Alert */}
         {showAlert && (
-          <div 
-            className={`alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3 ${alertClass}`} 
-            role="alert" 
-            style={{ zIndex: 1050 }}
-          >
-            Good Luck!
-            <button 
-              type="button" 
-              className="btn-close" 
-              aria-label="Close" 
-              onClick={() => setShowAlert(false)}
-            ></button>
-          </div>
-        )}
+          <Alert
+              content="Good Luck!"
+              alertClass="alert-success"
+              onClose={() => setShowAlert(false)}
+          />
+          )}
+
         <div className="row">
           <div className="col">
             <table id="bingo-card" className={`table table-bordered table-responsive-sm mx-auto ${tableClass}`} style={{maxWidth: '90%'}}>

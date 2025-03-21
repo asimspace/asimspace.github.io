@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Alert from '../components/Alert';
+import { Button, Modal } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 const BingoCard = () => {
     const [boardNumbers, setBoardNumbers] = useState({});
@@ -8,6 +10,9 @@ const BingoCard = () => {
     const [clickedCells, setClickedCells] = useState({});
     const [tableClass, setTableClass] = useState('');
     const [showAlert, setShowAlert] = useState(true);
+    const [isDirty, setIsDirty] = useState(false); 
+
+    const navigate = useNavigate();
 
     useEffect(() => {
       const columns = {
@@ -26,6 +31,21 @@ const BingoCard = () => {
         generateBingoBoard();
       }
     }, [boardNumbers, clickedCells]);
+
+    useEffect(() => {
+      const handleBeforeUnload = (event) => {
+          if (isDirty) {
+              event.preventDefault();
+              event.returnValue = 'Your current Bingo Card will be lost! Do you want to reload the page?'; // Default browser confirmation dialog
+          }
+      };
+
+      window.addEventListener('beforeunload', handleBeforeUnload);
+
+      return () => {
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+      };
+  }, [isDirty]);
 
     const generateBingoBoard = () => {
       // Create the board rows
@@ -68,6 +88,7 @@ const BingoCard = () => {
     };
 
     const handleCellClick = (cellKey) => {
+      setIsDirty(true);
       setClickedCells(prevState => ({
         ...prevState,
         [cellKey]: !prevState[cellKey]
@@ -84,7 +105,7 @@ const BingoCard = () => {
         <Helmet>
           <title>Bingo Card - Player</title>
         </Helmet>
-        
+
         {/* Bootstrap Alert */}
         {showAlert && (
           <Alert
@@ -112,6 +133,7 @@ const BingoCard = () => {
             </table>
           </div>
         </div>
+
       </div>
     );
 };

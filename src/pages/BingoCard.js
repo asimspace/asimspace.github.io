@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Alert from '../components/Alert';
 
-
 const BingoCard = () => {
     const [boardNumbers, setBoardNumbers] = useState({});
     const [boardRows, setBoardRows] = useState([]);
@@ -11,20 +10,24 @@ const BingoCard = () => {
     const [showAlert, setShowAlert] = useState(true);
 
     useEffect(() => {
-      // Load bingo card numbers from localStorage if available
-      const savedBoardNumbers = localStorage.getItem('bingoBoardNumbers');
-      if (savedBoardNumbers) {
-        setBoardNumbers(JSON.parse(savedBoardNumbers));
-      } else {
-        generateNewBingoCard();
-      }
-      setTableClass(getRandomTableClass());
+        // Load bingo card numbers from localStorage if available
+        const savedBoardNumbers = localStorage.getItem('bingoBoardNumbers');
+        const savedClickedCells = localStorage.getItem('clickedCells');
+        if (savedBoardNumbers) {
+            setBoardNumbers(JSON.parse(savedBoardNumbers));
+        } else {
+            generateNewBingoCard();
+        }
+        if (savedClickedCells) {
+            setClickedCells(JSON.parse(savedClickedCells));
+        }
+        setTableClass(getRandomTableClass());
     }, []);
 
     useEffect(() => {
-      if (Object.keys(boardNumbers).length > 0) {
-        generateBingoBoard();
-      }
+        if (Object.keys(boardNumbers).length > 0) {
+            generateBingoBoard();
+        }
     }, [boardNumbers, clickedCells]);
 
     const generateNewBingoCard = () => {
@@ -38,6 +41,8 @@ const BingoCard = () => {
         setBoardNumbers(columns);
         localStorage.setItem('bingoBoardNumbers', JSON.stringify(columns)); // Save to localStorage
         setClickedCells({});
+        localStorage.removeItem('clickedCells'); // Clear clicked cells in localStorage
+        setTableClass(getRandomTableClass()); // Change table class
     };
 
     const generateBingoBoard = () => {
@@ -79,10 +84,12 @@ const BingoCard = () => {
     };
 
     const handleCellClick = (cellKey) => {
-        setClickedCells(prevState => ({
-            ...prevState,
-            [cellKey]: !prevState[cellKey]
-        }));
+        const updatedClickedCells = {
+            ...clickedCells,
+            [cellKey]: !clickedCells[cellKey]
+        };
+        setClickedCells(updatedClickedCells);
+        localStorage.setItem('clickedCells', JSON.stringify(updatedClickedCells)); // Save clicked cells to localStorage
     };
 
     const getRandomTableClass = () => {
@@ -97,47 +104,46 @@ const BingoCard = () => {
     };
 
     return (
-      <div className="container text-center my-5 pt-5">
-        <Helmet>
-          <title>Bingo Card - Player</title>
-        </Helmet>
+        <div className="container text-center my-5 pt-5">
+            <Helmet>
+                <title>Bingo Card - Player</title>
+            </Helmet>
 
-        {/* Bootstrap Alert */}
-        {showAlert && (
-          <Alert
-              content="Good Luck!"
-              alertClass="alert-success"
-              onClose={() => setShowAlert(false)}
-          />
-          )}
+            {/* Bootstrap Alert */}
+            {showAlert && (
+                <Alert
+                    content="Good Luck!"
+                    alertClass="alert-success"
+                    onClose={() => setShowAlert(false)}
+                />
+            )}
 
-        <div className="row">
-          <div className="col">
-            <table id="bingo-card" className={`table table-bordered table-responsive-sm mx-auto ${tableClass}`} style={{maxWidth: '90%'}}>
-              <thead>
-                <tr>
-                  <td className="text-primary ">B</td>
-                  <td className="text-success ">I</td>
-                  <td className="text-danger ">N</td>
-                  <td className="text-warning ">G</td>
-                  <td className="text-dark ">O</td>
-                </tr>
-              </thead>
-              <tbody>
-              {boardRows}
-              </tbody>
-            </table>
-          </div>
+            <div className="row">
+                <div className="col">
+                    <table id="bingo-card" className={`table table-bordered table-responsive-sm mx-auto ${tableClass}`} style={{ maxWidth: '90%' }}>
+                        <thead>
+                            <tr>
+                                <td className="text-primary ">B</td>
+                                <td className="text-success ">I</td>
+                                <td className="text-danger ">N</td>
+                                <td className="text-warning ">G</td>
+                                <td className="text-dark ">O</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {boardRows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {/* Refresh Icon */}
+            <div className="mt-3">
+                <button className="btn btn-outline-secondary" onClick={handleRefreshClick}>
+                  NEW CARD!
+                </button>
+            </div>
         </div>
-
-        {/* Refresh Icon */}
-        <div className="mt-5">
-          <button className="btn btn-outline-secondary" onClick={handleRefreshClick}>
-              NEW BINGO CARD!
-          </button>
-        </div>
-
-      </div>
     );
 };
 

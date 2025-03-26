@@ -9,10 +9,24 @@ const BingoCard = () => {
     const [tableClass, setTableClass] = useState('');
     const [showAlert, setShowAlert] = useState(true);
 
+    // Helper functions for cookies
+    const setCookie = (name, value, days) => {
+        const expires = new Date(Date.now() + days * 864e5).toUTCString();
+        document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+    };
+
+    const getCookie = (name) => {
+        return document.cookie.split('; ').reduce((r, v) => {
+            const [key, val] = v.split('=');
+            return key === name ? decodeURIComponent(val) : r;
+        }, '');
+    };
+
     useEffect(() => {
-        // Load bingo card numbers from localStorage if available
-        const savedBoardNumbers = localStorage.getItem('bingoBoardNumbers');
-        const savedClickedCells = localStorage.getItem('clickedCells');
+        // Load bingo card numbers and clicked cells from localStorage or cookies
+        const savedBoardNumbers = localStorage.getItem('bingoBoardNumbers') || getCookie('bingoBoardNumbers');
+        const savedClickedCells = localStorage.getItem('clickedCells') || getCookie('clickedCells');
+
         if (savedBoardNumbers) {
             setBoardNumbers(JSON.parse(savedBoardNumbers));
         } else {
@@ -39,9 +53,12 @@ const BingoCard = () => {
             O: generateRandomNumbers(61, 75, 5)
         };
         setBoardNumbers(columns);
-        localStorage.setItem('bingoBoardNumbers', JSON.stringify(columns)); // Save to localStorage
+        const boardNumbersString = JSON.stringify(columns);
+        localStorage.setItem('bingoBoardNumbers', boardNumbersString); // Save to localStorage
+        setCookie('bingoBoardNumbers', boardNumbersString, 7); // Save to cookies as fallback
         setClickedCells({});
         localStorage.removeItem('clickedCells'); // Clear clicked cells in localStorage
+        setCookie('clickedCells', '', -1); // Clear clicked cells in cookies
         setTableClass(getRandomTableClass()); // Change table class
     };
 
@@ -89,11 +106,18 @@ const BingoCard = () => {
             [cellKey]: !clickedCells[cellKey]
         };
         setClickedCells(updatedClickedCells);
-        localStorage.setItem('clickedCells', JSON.stringify(updatedClickedCells)); // Save clicked cells to localStorage
+        const clickedCellsString = JSON.stringify(updatedClickedCells);
+        localStorage.setItem('clickedCells', clickedCellsString); // Save clicked cells to localStorage
+        setCookie('clickedCells', clickedCellsString, 7); // Save clicked cells to cookies as fallback
     };
 
     const getRandomTableClass = () => {
-        const classes = ['border-primary', 'border-danger', 'border-warning', 'border-dark', 'border-success', 'border-info'];
+        const classes = ['border-primary bg-primary text-white', 
+                          'border-danger bg-danger text-white', 
+                          'border-warning bg-warning', 
+                          'border-dark bg-dark text-white', 
+                          'border-success bg-success text-white', 
+                          'border-info bg-info'];
         return classes[Math.floor(Math.random() * classes.length)];
     };
 
@@ -120,14 +144,14 @@ const BingoCard = () => {
 
             <div className="row">
                 <div className="col">
-                    <table id="bingo-card" className={`table table-bordered table-responsive-sm mx-auto ${tableClass}`} style={{ maxWidth: '90%' }}>
+                    <table id="bingo-card" className={`table table-responsive-sm mx-auto ${tableClass}`} style={{ maxWidth: '90%' }}>
                         <thead>
                             <tr>
-                                <td className="text-primary ">B</td>
-                                <td className="text-success ">I</td>
-                                <td className="text-danger ">N</td>
-                                <td className="text-warning ">G</td>
-                                <td className="text-dark ">O</td>
+                                <td className={`${tableClass}`}>B</td>
+                                <td className={`${tableClass}`}>I</td>
+                                <td className={`${tableClass}`}>N</td>
+                                <td className={`${tableClass}`}>G</td>
+                                <td className={`${tableClass}`}>O</td>
                             </tr>
                         </thead>
                         <tbody>
@@ -139,10 +163,10 @@ const BingoCard = () => {
 
             {/* Refresh Icon */}
             <div className="mt-3">
-                <button className="btn btn-outline-secondary" onClick={handleRefreshClick}>
+            <button className="btn btn-outline-secondary" onClick={handleRefreshClick}>
                   NEW CARD!
                 </button>
-            </div>
+             </div>
         </div>
     );
 };

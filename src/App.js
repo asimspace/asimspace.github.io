@@ -8,7 +8,6 @@ import Home from "./pages/Home";
 import PlayBingo from "./pages/BingoGenerator";
 import About from "./pages/About";
 import BingoCard from "./pages/BingoCard";
-import QRModal from "./components/QRModal";
 import { HelmetProvider } from "react-helmet-async";
 import BingoGuide from "./components/BingoGuide";
 
@@ -27,7 +26,6 @@ const App = () => {
           <Route path="/bingo-card" element={<BingoCard />} />
         </Routes>
         <Footer />
-        <QRModal show={modalShow} onHide={() => setModalShow(false)} />
         <BingoGuide show={offCanvasShow} hide={() => setOffCanvasShow(false)} />
       </Router>
     </HelmetProvider>

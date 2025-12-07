@@ -10,6 +10,39 @@
   }
 }
 
+/* Full viewport height layout accounting for fixed navbar */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Navbar fixed at top */
+nav.navbar.fixed-top {
+  flex-shrink: 0;
+}
+
+/* Main content section fills remaining space minus footer */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  min-height: 0; /* Allow flex item to shrink below content size */
+  padding-top: 56px; /* Account for fixed navbar height */
+}
+
+/* Footer stays at bottom */
+footer {
+  flex-shrink: 0;
+}
+
 /* Fade-in animation */
 .fade-in {
   opacity: 0;

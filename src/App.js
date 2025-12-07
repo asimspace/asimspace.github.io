@@ -14,18 +14,32 @@ import BingoGuide from "./components/BingoGuide";
 const App = () => {
   const [modalShow, setModalShow] = useState(false);
   const [offCanvasShow, setOffCanvasShow] = useState(false);
+  const [isAutomating, setIsAutomating] = useState(false);
+  const [automationCallback, setAutomationCallback] = useState(null);
+  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+
+  const handleAutomate = (enabled, interval) => {
+    setIsAutomating(enabled);
+    setAutomationCallback({ enabled, interval });
+  };
+
+  const handleSoundToggle = (enabled) => {
+    setIsSoundEnabled(enabled);
+  };
 
   return (
     <HelmetProvider>
       <Router>
         <Header showModal={() => setModalShow(true)} />
-        <Routes>
-          <Route path="/" element={<Home showOffCanvas={() => setOffCanvasShow(true)}/>} />
-          <Route path="/about" element={<About />} />
-          <Route path="/play-bingo" element={<PlayBingo />} />
-          <Route path="/bingo-card" element={<BingoCard />} />
-        </Routes>
-        <Footer />
+        <main>
+          <Routes>
+            <Route path="/" element={<Home showOffCanvas={() => setOffCanvasShow(true)}/>} />
+            <Route path="/about" element={<About />} />
+            <Route path="/play-bingo" element={<PlayBingo automationCallback={automationCallback} isSoundEnabled={isSoundEnabled} onSoundToggle={handleSoundToggle} />} />
+            <Route path="/bingo-card" element={<BingoCard />} />
+          </Routes>
+        </main>
+        <Footer onAutomate={handleAutomate} isAutomating={isAutomating} isSoundEnabled={isSoundEnabled} onSoundToggle={handleSoundToggle} />
         <BingoGuide show={offCanvasShow} hide={() => setOffCanvasShow(false)} />
       </Router>
     </HelmetProvider>

@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { Button, Spinner, Modal } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
-import { VolumeUp, VolumeMute } from "react-bootstrap-icons";
 import ModalOverlay from "../components/ModalOverlay";
+import BouncingBalls from "../components/BouncingBalls";
+import PopperEffect from "../components/PopperEffect";
 
-const BingoGenerator = () => {
+const BingoGenerator = ({ automationCallback, isSoundEnabled, onSoundToggle }) => {
     const [generatedNumbers, setGeneratedNumbers] = useState(() => {
         const savedNumbers = localStorage.getItem('generatedNumbers');
         return savedNumbers ? JSON.parse(savedNumbers) : [];
@@ -12,8 +13,9 @@ const BingoGenerator = () => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [fadingOut, setFadingOut] = useState(false);
     const [showOverlay, setShowOverlay] = useState(false); // State to control overlay visibility
-    const [isSoundEnabled, setIsSoundEnabled] = useState(true);
-    const heartbeatAudioRef = useRef(new Audio('/heartbeat.m4a'));
+    const [showPopper, setShowPopper] = useState(false);
+    const heartbeatAudioRef = useRef(new Audio('/shake.mp3'));
+    const automationIntervalRef = useRef(null);
 
     useEffect(() => {
         localStorage.setItem('generatedNumbers', JSON.stringify(generatedNumbers));
@@ -29,6 +31,34 @@ const BingoGenerator = () => {
             audio.currentTime = 0;
         }
     }, [isGenerating, isSoundEnabled]);
+
+    useEffect(() => {
+        if (!automationCallback) return;
+
+        if (automationCallback.enabled) {
+            // Clear any existing interval
+            if (automationIntervalRef.current) {
+                clearInterval(automationIntervalRef.current);
+            }
+
+            // Start automation
+            automationIntervalRef.current = setInterval(() => {
+                startGenerating();
+            }, automationCallback.interval * 1000);
+        } else {
+            // Stop automation
+            if (automationIntervalRef.current) {
+                clearInterval(automationIntervalRef.current);
+                automationIntervalRef.current = null;
+            }
+        }
+
+        return () => {
+            if (automationIntervalRef.current) {
+                clearInterval(automationIntervalRef.current);
+            }
+        };
+    }, [automationCallback]);
   
     const startGenerating = () => {
         setIsGenerating(true);
@@ -76,42 +106,52 @@ const BingoGenerator = () => {
     };
 
     const handleVerifyWinner = () => {
+        setShowPopper(true);
         resetNumber(); // Perform the reset action
         setShowOverlay(false); // Close the overlay
+        setTimeout(() => setShowPopper(false), 3000); // Hide popper after 3 seconds
     };
 
     return (
-      <div className="container text-center my-5 pt-5">
-        <Helmet>
-          <title>Free Bingo Number Generator - Home </title>
-        </Helmet>
-        <div className="row">
-            <div className="col">
-                <Button id="generateButton" onClick={startGenerating} className="btn btn-primary btn-lg rounded-0 fw-light" disabled={isGenerating}>
-                    {isGenerating ? (
-                        <>
-                            <Spinner animation="grow" size="sm" /> Picking
-                        </>
-                    ) : (
-                        "Pick a Number"
-                    )}
-                </Button>
-                <div id="bingoNumbers" className="my-5 d-flex flex-wrap justify-content-center gap-1 mt-4">
-                    {generatedNumbers.map((num, index) => {
-                        const badgeClass = {
-                            B: "bg-primary text-white",
-                            I: "bg-success text-white",
-                            N: "bg-danger text-white",
-                            G: "bg-warning",
-                            O: "bg-dark text-white"
-                        }[num.charAt(0)];
-                        return (
-                            <span key={index} className={`d-inline px-1 fw-light ${badgeClass} ${fadingOut ? '' : 'fade-in'}`}>{num}</span>
-                        );
-                    })}
+      <>
+        <BouncingBalls isGenerating={isGenerating} />
+        <PopperEffect trigger={showPopper} />
+        <div className="d-flex flex-column min-vh-100">
+          <div className="flex-grow-1 d-flex align-items-center justify-content-center">
+            <div className="container text-center">
+              <Helmet>
+                <title>Free Bingo Number Generator - Home </title>
+              </Helmet>
+              <div className="row">
+                <div className="col">
+                  <Button id="generateButton" onClick={startGenerating} className="btn btn-primary btn-lg rounded-0 fw-light" disabled={isGenerating}>
+                      {isGenerating ? (
+                          <>
+                              <Spinner animation="grow" size="sm" /> Picking
+                          </>
+                      ) : (
+                          "Pick a Number"
+                      )}
+                  </Button>
+                  <div id="bingoNumbers" className="my-5 d-flex flex-wrap justify-content-center gap-1 mt-4">
+                      {generatedNumbers.map((num, index) => {
+                          const badgeClass = {
+                              B: "bg-primary text-white",
+                              I: "bg-success text-white",
+                              N: "bg-danger text-white",
+                              G: "bg-warning",
+                              O: "bg-dark text-white"
+                          }[num.charAt(0)];
+                          return (
+                              <span key={index} className={`d-inline px-1 fw-light ${badgeClass} ${fadingOut ? '' : 'fade-in'}`}>{num}</span>
+                          );
+                      })}
+                  </div>
+                  <Button onClick={handleBingoClick} variant="danger" className="btn-lg rounded-0" disabled={generatedNumbers.length < 4}>Bingo!</Button>
                 </div>
-                <Button onClick={handleBingoClick} variant="danger" className="btn-lg rounded-0" disabled={generatedNumbers.length < 4}>Bingo!</Button>
+              </div>
             </div>
+          </div>
         </div>
 
         {/* Overlay Modal */}
@@ -130,7 +170,22 @@ const BingoGenerator = () => {
                   <td style={{ width: '7%' }}>{letter}</td>
                   <td>
                     {numbers.map((number, index) => (
-                      <span key={index} className="badge bg-success mx-1">{number}</span>
+                      <span 
+                        key={index} 
+                        className="badge bg-success mx-1"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: '50%',
+                          width: '2.5rem',
+                          height: '2.5rem',
+                          fontSize: '0.875rem',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        {number}
+                      </span>
                     ))}
                   </td>
                 </tr>
@@ -138,33 +193,7 @@ const BingoGenerator = () => {
             </tbody>
           </table>
         </ModalOverlay>
-
-        {/* Floating Volume Control Button */}
-        <button
-          onClick={() => setIsSoundEnabled(!isSoundEnabled)}
-          style={{
-            position: 'fixed',
-            bottom: '30px',
-            right: '30px',
-            width: '50px',
-            height: '50px',
-            borderRadius: '50%',
-            border: 'none',
-            backgroundColor: isSoundEnabled ? '#0d6efd' : '#6c757d',
-            color: 'white',
-            fontSize: '24px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
-            transition: 'background-color 0.3s ease',
-          }}
-          title={isSoundEnabled ? 'Mute sound' : 'Unmute sound'}
-        >
-          {isSoundEnabled ? <VolumeUp size={28} /> : <VolumeMute size={28} />}
-        </button>
-      </div>
+      </>
     );
 };
 

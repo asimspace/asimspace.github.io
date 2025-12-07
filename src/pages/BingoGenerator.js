@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button, Spinner, Modal } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
+import { VolumeUp, VolumeMute } from "react-bootstrap-icons";
 import ModalOverlay from "../components/ModalOverlay";
 
 const BingoGenerator = () => {
@@ -11,10 +12,23 @@ const BingoGenerator = () => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [fadingOut, setFadingOut] = useState(false);
     const [showOverlay, setShowOverlay] = useState(false); // State to control overlay visibility
+    const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+    const heartbeatAudioRef = useRef(new Audio('/heartbeat.m4a'));
 
     useEffect(() => {
         localStorage.setItem('generatedNumbers', JSON.stringify(generatedNumbers));
     }, [generatedNumbers]);
+
+    useEffect(() => {
+        const audio = heartbeatAudioRef.current;
+        if (isGenerating && isSoundEnabled) {
+            audio.loop = true;
+            audio.play().catch(err => console.log('Autoplay prevented:', err));
+        } else {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+    }, [isGenerating, isSoundEnabled]);
   
     const startGenerating = () => {
         setIsGenerating(true);
@@ -124,6 +138,32 @@ const BingoGenerator = () => {
             </tbody>
           </table>
         </ModalOverlay>
+
+        {/* Floating Volume Control Button */}
+        <button
+          onClick={() => setIsSoundEnabled(!isSoundEnabled)}
+          style={{
+            position: 'fixed',
+            bottom: '30px',
+            right: '30px',
+            width: '50px',
+            height: '50px',
+            borderRadius: '50%',
+            border: 'none',
+            backgroundColor: isSoundEnabled ? '#0d6efd' : '#6c757d',
+            color: 'white',
+            fontSize: '24px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+            transition: 'background-color 0.3s ease',
+          }}
+          title={isSoundEnabled ? 'Mute sound' : 'Unmute sound'}
+        >
+          {isSoundEnabled ? <VolumeUp size={28} /> : <VolumeMute size={28} />}
+        </button>
       </div>
     );
 };

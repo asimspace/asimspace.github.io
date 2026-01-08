@@ -1,8 +1,15 @@
 import { Card, CardBody, Col, Container, Row } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import BingoModeModal from "../components/BingoModeModal";
 
 const Home = ({showOffCanvas}) => {
+  const [showBingoModeModal, setShowBingoModeModal] = useState(false);
+
+  const handlePlayBingoClick = () => {
+    setShowBingoModeModal(true);
+  };
 
   return (
     <Container className="text-center my-5 pt-5">
@@ -18,7 +25,7 @@ const Home = ({showOffCanvas}) => {
                   <h1 class="display-3 mb-4">Do you know?</h1>
                   <p class="lead">Bingo originated in Italy and is descended from Lo Giuoco del Lotto d'Italia,
                     the Italian national lottery, which has been played since 1530s.</p>
-                  <Link className="btn btn-primary btn-lg rounded-0 my-5" to="/play-bingo">Let's Play Bingo!</Link>
+                  <button className="btn btn-primary btn-lg rounded-0 my-5" onClick={handlePlayBingoClick}>Let's Play Bingo!</button>
                 </div>     
               </Card.Text>
             </CardBody>
@@ -38,6 +45,11 @@ const Home = ({showOffCanvas}) => {
           </Card>
         </Col>  
       </Row>
+      
+      <BingoModeModal 
+        show={showBingoModeModal} 
+        onHide={() => setShowBingoModeModal(false)} 
+      />
     </Container>
   );
 };

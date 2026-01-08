@@ -6,8 +6,10 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import PlayBingo from "./pages/BingoGenerator";
+import BabyShowerBingo from "./pages/BabyShowerBingo";
 import About from "./pages/About";
 import BingoCard from "./pages/BingoCard";
+import BabyShowerBingoCard from "./pages/BabyShowerBingoCard";
 import { HelmetProvider } from "react-helmet-async";
 import BingoGuide from "./components/BingoGuide";
 
@@ -36,7 +38,9 @@ const App = () => {
             <Route path="/" element={<Home showOffCanvas={() => setOffCanvasShow(true)}/>} />
             <Route path="/about" element={<About />} />
             <Route path="/play-bingo" element={<PlayBingo automationCallback={automationCallback} isSoundEnabled={isSoundEnabled} onSoundToggle={handleSoundToggle} />} />
+            <Route path="/baby-shower-bingo" element={<BabyShowerBingo automationCallback={automationCallback} isSoundEnabled={isSoundEnabled} onSoundToggle={handleSoundToggle} />} />
             <Route path="/bingo-card" element={<BingoCard />} />
+            <Route path="/baby-shower-bingo-card" element={<BabyShowerBingoCard />} />
           </Routes>
         </main>
         <Footer onAutomate={handleAutomate} isAutomating={isAutomating} isSoundEnabled={isSoundEnabled} onSoundToggle={handleSoundToggle} />

@@ -15,6 +15,8 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  background: white;
+  min-height: 100vh;
 }
 
 #root {
@@ -78,6 +80,7 @@ footer {
   width: 100%;
   max-width: 90%;
   margin: auto;
+  table-layout: fixed;
 }
 
 /* Style for individual bingo cells */
@@ -86,6 +89,7 @@ footer {
   -webkit-transition: background-color 0.3s ease-in-out, text-decoration 0.1s ease-in-out;
   -moz-transition: background-color 0.3s ease-in-out, text-decoration 0.1s ease-in-out;
   -o-transition: background-color 0.3s ease-in-out, text-decoration 0.1s ease-in-out;
+  width: 20%;
 }
 
 #bingo-card thead td {
@@ -98,12 +102,13 @@ footer {
 /* Bingo card cells */
 #bingo-card tr td {
   cursor: pointer;
-  padding: 1.5rem 0.5rem;
   font-size: 1.5rem;
   text-align: center;
   vertical-align: middle;
   border: 2px solid #000;
   transition: background-color 0.3s ease, text-decoration 0.1s ease-in-out;
+  width: 20% !important;
+  box-sizing: border-box;
 }
 
 /* Ensure proper tap/click behavior on touch devices */
@@ -152,4 +157,46 @@ footer {
 /* Apply slide-out animation */
 .slide-out {
   animation: slideOut 0.5s forwards;
+}
+
+/* Modal 90% width */
+.modal-90w {
+  max-width: 90vw !important;
+}
+
+.modal-90w .modal-dialog {
+  max-width: 90vw !important;
+}
+
+/* Baby Shower Bingo Pages - Gradient Background */
+.baby-shower-gradient {
+  background: linear-gradient(179deg, #CCFBFF, #EF96C5);
+  background-size: 400% 400%;
+  min-height: 100vh;
+
+  -webkit-animation: Animated-Background 30s ease infinite;
+  -moz-animation: Animated-Background 30s ease infinite;
+  -o-animation: Animated-Background 30s ease infinite;
+  animation: Animated-Background 30s ease infinite;
+}
+
+@-webkit-keyframes Animated-Background {
+    0%{background-position:51% 0%}
+    50%{background-position:50% 100%}
+    100%{background-position:51% 0%}
+}
+@-moz-keyframes Animated-Background {
+    0%{background-position:51% 0%}
+    50%{background-position:50% 100%}
+    100%{background-position:51% 0%}
+}
+@-o-keyframes Animated-Background {
+    0%{background-position:51% 0%}
+    50%{background-position:50% 100%}
+    100%{background-position:51% 0%}
+}
+@keyframes Animated-Background {
+    0%{background-position:51% 0%}
+    50%{background-position:50% 100%}
+    100%{background-position:51% 0%}
 }

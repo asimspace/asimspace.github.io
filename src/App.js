@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
@@ -20,6 +20,16 @@ const App = () => {
   const [automationCallback, setAutomationCallback] = useState(null);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
+  // Cleanup unused localStorage keys on app initialization
+  useEffect(() => {
+    const unusedKeys = ['bingoBoardNumbers_classic', 'clickedCells_classic'];
+    unusedKeys.forEach(key => {
+      if (localStorage.getItem(key)) {
+        localStorage.removeItem(key);
+      }
+    });
+  }, []);
+
   const handleAutomate = (enabled, interval) => {
     setIsAutomating(enabled);
     setAutomationCallback({ enabled, interval });
@@ -38,7 +48,7 @@ const App = () => {
             <Route path="/" element={<Home showOffCanvas={() => setOffCanvasShow(true)}/>} />
             <Route path="/about" element={<About />} />
             <Route path="/play-bingo" element={<PlayBingo automationCallback={automationCallback} isSoundEnabled={isSoundEnabled} onSoundToggle={handleSoundToggle} />} />
-            <Route path="/baby-shower-bingo" element={<BabyShowerBingo automationCallback={automationCallback} isSoundEnabled={isSoundEnabled} onSoundToggle={handleSoundToggle} />} />
+            <Route path="/baby-shower-bingo" element={<BabyShowerBingo automationCallback={automationCallback} onAutomate={handleAutomate} />} />
             <Route path="/bingo-card" element={<BingoCard />} />
             <Route path="/baby-shower-bingo-card" element={<BabyShowerBingoCard />} />
           </Routes>

@@ -3,9 +3,9 @@ import { Modal, Button } from "react-bootstrap";
 
 const ModalOverlay = ({ show, onHide, title, children, 
                         footerButtonText, footerBtnColor,
-                        onFooterButtonClick }) => {
+                        onFooterButtonClick, fullWidth }) => {
     return (
-        <Modal  show={show} onHide={onHide} >
+        <Modal  show={show} onHide={onHide} size={fullWidth ? "lg" : undefined} dialogClassName={fullWidth ? "modal-90w" : ""} >
             <Modal.Header closeButton>
                 <Modal.Title>{title}</Modal.Title>
             </Modal.Header>

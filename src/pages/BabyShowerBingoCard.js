@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import Alert from '../components/Alert';
+import { babyShowerWords } from '../constants/babyShowerWords';
 
 const BabyShowerBingoCard = () => {
     const [boardNumbers, setBoardNumbers] = useState({});
@@ -10,17 +11,6 @@ const BabyShowerBingoCard = () => {
     const [tableClass, setTableClass] = useState('');
     const [showAlert, setShowAlert] = useState(true);
     const navigate = useNavigate();
-
-    const babyShowerWords = [
-        'Baby', 'Diapers', 'Bottle', 'Pacifier', 'Crib', 'Stroller', 'Blanket', 'Rattle', 'Onesie', 'Bib',
-        'Booties', 'Teddy Bear', 'Lullaby', 'Rocking Chair', 'Baby Powder', 'Baby Wipes', 'Burp Cloth', 'Changing Table', 'High Chair', 'Baby Monitor',
-        'Teething Ring', 'Baby Shampoo', 'Hooded Towel', 'Storybook', 'Mobile', 'Nursery', 'Swaddle', 'Formula', 'Breast Pump', 'Diaper Bag',
-        'Car Seat', 'Play Mat', 'Sippy Cup', 'Night Light', 'Baby Lotion', 'Socks', 'Mittens', 'Baby Carrier', 'Tummy Time', 'Growth Chart',
-        'Bath Time', 'Baby Food', 'Spoon', 'Bib Clip', 'Cradle', 'Baby Swing', 'Baby Walker', 'Teether', 'Plush Toy', 'Pajamas',
-        'Baby Oil', 'Nail Clippers', 'Thermometer', 'First Steps', 'Giggle', 'Yawn', 'Nap Time', 'Peekaboo', 'Lullaby Book', 'Baby Hat',
-        'Diaper Rash Cream', 'Feeding Time', 'Milestone', 'Ultrasound', 'Baby Shower', 'Stork', 'Baby Registry', 'Name Reveal', 'Mommy-to-be', 'Daddy-to-be',
-        'Gender Reveal', 'Baby Blanket', 'Cradle Cap', 'Newborn', 'Teething Gel'
-    ];
 
     // Helper functions for cookies
     const setCookie = (name, value, days) => {
@@ -35,18 +25,84 @@ const BabyShowerBingoCard = () => {
         }, '');
     };
 
+    const migrateOldFormat = (savedData) => {
+        // Convert old column format (B, I, N, G, O) to new flat format (cell-0 to cell-24)
+        if (savedData && savedData.B) {
+            // Old format detected
+            const boardData = {};
+            let cellIndex = 0;
+            for (let col of ['B', 'I', 'N', 'G', 'O']) {
+                if (savedData[col]) {
+                    for (let row = 0; row < 5; row++) {
+                        boardData[`cell-${cellIndex}`] = savedData[col][row];
+                        cellIndex++;
+                    }
+                }
+            }
+            return boardData;
+        }
+        // Already in new format
+        return savedData;
+    };
+
+    const migrateOldClickedCells = (savedClickedCells) => {
+        // Convert old clicked cells format (B-0, I-1, etc) to new format (cell-0, cell-1, etc)
+        const migratedCells = {};
+        
+        for (const key in savedClickedCells) {
+            if (key.includes('-')) {
+                const [col, row] = key.split('-');
+                const colIndex = ['B', 'I', 'N', 'G', 'O'].indexOf(col);
+                if (colIndex !== -1) {
+                    const cellIndex = colIndex * 5 + parseInt(row);
+                    migratedCells[`cell-${cellIndex}`] = savedClickedCells[key];
+                } else {
+                    // Already new format
+                    migratedCells[key] = savedClickedCells[key];
+                }
+            } else {
+                // Already new format
+                migratedCells[key] = savedClickedCells[key];
+            }
+        }
+        
+        return Object.keys(migratedCells).length > 0 ? migratedCells : savedClickedCells;
+    };
+
+    useEffect(() => {
+        // Apply gradient background to body for baby shower pages
+        document.body.style.background = 'linear-gradient(180deg, #CCFBFF 0%, #EF96C5 100%)';
+        document.body.style.minHeight = '100vh';
+        
+        return () => {
+            // Reset to white when leaving the page
+            document.body.style.background = 'white';
+        };
+    }, []);
+
     useEffect(() => {
         // Load bingo card numbers and clicked cells from localStorage or cookies
         const savedBoardNumbers = localStorage.getItem('babyShowerBingoBoardNumbers') || getCookie('babyShowerBingoBoardNumbers');
         const savedClickedCells = localStorage.getItem('babyShowerClickedCells') || getCookie('babyShowerClickedCells');
 
         if (savedBoardNumbers) {
-            setBoardNumbers(JSON.parse(savedBoardNumbers));
+            const parsedBoard = JSON.parse(savedBoardNumbers);
+            const migratedBoard = migrateOldFormat(parsedBoard);
+            
+            // Check for duplicates and regenerate if found
+            if (hasDuplicates(migratedBoard)) {
+                generateNewBingoCard();
+                setClickedCells({});
+            } else {
+                setBoardNumbers(migratedBoard);
+                if (savedClickedCells) {
+                    const parsedClickedCells = JSON.parse(savedClickedCells);
+                    const migratedClickedCells = migrateOldClickedCells(parsedClickedCells);
+                    setClickedCells(migratedClickedCells);
+                }
+            }
         } else {
             generateNewBingoCard();
-        }
-        if (savedClickedCells) {
-            setClickedCells(JSON.parse(savedClickedCells));
         }
         setTableClass(getRandomTableClass());
     }, []);
@@ -58,16 +114,16 @@ const BabyShowerBingoCard = () => {
     }, [boardNumbers, clickedCells]);
 
     const generateNewBingoCard = () => {
-        const columns = {
-            B: generateRandomWords(5),
-            I: generateRandomWords(5),
-            N: generateRandomWords(5),
-            G: generateRandomWords(5),
-            O: generateRandomWords(5)
-        };
+        // Generate 25 unique words
+        const uniqueWords = generateRandomWords(25);
+        
+        const boardData = {};
+        uniqueWords.forEach((word, index) => {
+            boardData[`cell-${index}`] = word;
+        });
 
-        setBoardNumbers(columns);
-        const boardNumbersString = JSON.stringify(columns);
+        setBoardNumbers(boardData);
+        const boardNumbersString = JSON.stringify(boardData);
         localStorage.setItem('babyShowerBingoBoardNumbers', boardNumbersString);
         setCookie('babyShowerBingoBoardNumbers', boardNumbersString, 7);
         setClickedCells({});
@@ -89,35 +145,44 @@ const BabyShowerBingoCard = () => {
         return words;
     };
 
+    const hasDuplicates = (boardData) => {
+        const values = Object.values(boardData);
+        const uniqueValues = new Set(values);
+        return values.length !== uniqueValues.size;
+    };
+
     const generateBingoBoard = () => {
         const rows = [];
         for (let row = 0; row < 5; row++) {
             const rowCells = [];
-            for (let col of ['B', 'I', 'N', 'G', 'O']) {
-                const cellKey = `${col}-${row}`;
-                if (col === 'N' && row === 2) {
-                    rowCells.push(<td key={cellKey} className="text-center font-weight-bold text-danger align-middle bg-secondary-subtle">★</td>);
-                } else {
-                    const isClicked = clickedCells[cellKey];
-                    const cellContent = boardNumbers[col] && boardNumbers[col][row];
-                    const cellStyle = {
-                        textDecoration: isClicked ? 'line-through' : 'none',
-                        fontSize: '0.85rem',
-                        wordWrap: 'break-word',
-                        padding: '0.5rem'
-                    };
-                    
-                    rowCells.push(
-                        <td
-                            key={cellKey}
-                            className={`text-center align-middle bingo-cell ${isClicked ? 'bg-secondary-subtle' : ''}`}
-                            style={cellStyle}
-                            onClick={() => handleCellClick(cellKey)}
-                        >
-                            {cellContent}
-                        </td>
-                    );
-                }
+            for (let col = 0; col < 5; col++) {
+                const cellKey = `cell-${row * 5 + col}`;
+                const isClicked = clickedCells[cellKey];
+                const cellContent = boardNumbers[cellKey];
+                const cellStyle = {
+                    textDecoration: isClicked ? 'line-through' : 'none',
+                    fontSize: '1rem',
+                    fontWeight: '300',
+                    wordWrap: 'break-word',
+                    paddingTop: '1rem',
+                    paddingBottom: '1rem',
+                    paddingLeft: '0.5rem',
+                    paddingRight: '0.5rem',
+                    minHeight: '60px',
+                    verticalAlign: 'middle',
+                    textAlign: 'center'
+                };
+                
+                rowCells.push(
+                    <td
+                        key={cellKey}
+                        className={`text-center align-middle bingo-cell ${isClicked ? 'bg-secondary-subtle' : ''}`}
+                        style={cellStyle}
+                        onClick={() => handleCellClick(cellKey)}
+                    >
+                        {cellContent}
+                    </td>
+                );
             }
             rows.push(<tr key={row}>{rowCells}</tr>);
         }
@@ -136,12 +201,12 @@ const BabyShowerBingoCard = () => {
     };
 
     const getRandomTableClass = () => {
-        const classes = ['border-primary bg-primary text-white', 
-                          'border-danger bg-danger text-white', 
-                          'border-warning bg-warning', 
-                          'border-dark bg-dark text-white', 
-                          'border-success bg-success text-white', 
-                          'border-info bg-info'];
+        const classes = ['border-primary', 
+                          'border-danger', 
+                          'border-warning', 
+                          'border-dark', 
+                          'border-success', 
+                          'border-info'];
         return classes[Math.floor(Math.random() * classes.length)];
     };
 
@@ -157,6 +222,17 @@ const BabyShowerBingoCard = () => {
                 <title>Baby Shower Bingo Card - Player</title>
             </Helmet>
 
+            <style>{`
+                #bingo-card.baby-shower-card {
+                    background-color: white;
+                    border: 10px solid;
+                }
+                #bingo-card.baby-shower-card tr td {
+                    border: 1px solid black;
+                    background-color: white;
+                }
+            `}</style>
+
             {/* Bootstrap Alert */}
             {showAlert && (
                 <Alert
@@ -168,16 +244,7 @@ const BabyShowerBingoCard = () => {
 
             <div className="row">
                 <div className="col">
-                    <table id="bingo-card" className={`table table-responsive-sm mx-auto ${tableClass}`} style={{ maxWidth: '90%' }}>
-                        <thead>
-                            <tr>
-                                <td className={`${tableClass}`}>B</td>
-                                <td className={`${tableClass}`}>I</td>
-                                <td className={`${tableClass}`}>N</td>
-                                <td className={`${tableClass}`}>G</td>
-                                <td className={`${tableClass}`}>O</td>
-                            </tr>
-                        </thead>
+                    <table id="bingo-card" className={`baby-shower-card ${tableClass}`} style={{ maxWidth: '100vw', width: '100%', tableLayout: 'fixed', margin: '0 auto', borderCollapse: 'collapse' }}>
                         <tbody>
                             {boardRows}
                         </tbody>

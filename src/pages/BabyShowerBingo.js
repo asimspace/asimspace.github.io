@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { Button, Spinner } from "react-bootstrap";
+import { Button, Spinner, Alert } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
+import { SortAlphaDown, SortAlphaUp } from "react-bootstrap-icons";
 import ModalOverlay from "../components/ModalOverlay";
-import BouncingBalls from "../components/BouncingBalls";
 import PopperEffect from "../components/PopperEffect";
+import { babyShowerWords } from "../constants/babyShowerWords";
 
-const BabyShowerBingo = ({ automationCallback, isSoundEnabled, onSoundToggle }) => {
+const BabyShowerBingo = ({ automationCallback, onAutomate }) => {
     const [generatedNumbers, setGeneratedNumbers] = useState(() => {
         const savedNumbers = localStorage.getItem('babyShowerBingoNumbers');
         return savedNumbers ? JSON.parse(savedNumbers) : [];
@@ -14,7 +15,9 @@ const BabyShowerBingo = ({ automationCallback, isSoundEnabled, onSoundToggle }) 
     const [fadingOut, setFadingOut] = useState(false);
     const [showOverlay, setShowOverlay] = useState(false);
     const [showPopper, setShowPopper] = useState(false);
-    const heartbeatAudioRef = useRef(new Audio('/shake.mp3'));
+    const [sortOrder, setSortOrder] = useState(null); // 'asc', 'desc', or null
+    const [showAllPickedAlert, setShowAllPickedAlert] = useState(false);
+    const [isAnimatingBackground, setIsAnimatingBackground] = useState(false);
     const automationIntervalRef = useRef(null);
 
     useEffect(() => {
@@ -22,18 +25,28 @@ const BabyShowerBingo = ({ automationCallback, isSoundEnabled, onSoundToggle }) 
     }, [generatedNumbers]);
 
     useEffect(() => {
-        const audio = heartbeatAudioRef.current;
-        if (isGenerating && isSoundEnabled) {
-            audio.loop = true;
-            audio.play().catch(err => console.log('Autoplay prevented:', err));
-        } else {
-            audio.pause();
-            audio.currentTime = 0;
-        }
-    }, [isGenerating, isSoundEnabled]);
+        // Apply gradient background to body for baby shower pages
+        document.body.style.background = 'linear-gradient(180deg, #CCFBFF 0%, #EF96C5 100%)';
+        document.body.style.minHeight = '100vh';
+        
+        return () => {
+            // Reset to white when leaving the page
+            document.body.style.background = 'white';
+        };
+    }, []);
 
     useEffect(() => {
         if (!automationCallback) return;
+
+        // Disable automation if all items are picked
+        if (generatedNumbers.length === 75 && automationCallback.enabled) {
+            onAutomate(false, automationCallback.interval);
+            if (automationIntervalRef.current) {
+                clearInterval(automationIntervalRef.current);
+                automationIntervalRef.current = null;
+            }
+            return;
+        }
 
         if (automationCallback.enabled) {
             if (automationIntervalRef.current) {
@@ -55,31 +68,48 @@ const BabyShowerBingo = ({ automationCallback, isSoundEnabled, onSoundToggle }) 
                 clearInterval(automationIntervalRef.current);
             }
         };
-    }, [automationCallback]);
+    }, [automationCallback, generatedNumbers]);
 
     const startGenerating = () => {
         setIsGenerating(true);
-        setTimeout(generateBingoNumber, 2000);
+        setTimeout(() => generateBingoNumber(), 2000);
     };
 
     const generateBingoNumber = () => {
-        setIsGenerating(false);
-        const babyShowerItems = [
-            'Baby', 'Diapers', 'Bottle', 'Pacifier', 'Crib', 'Stroller', 'Blanket', 'Rattle', 'Onesie', 'Bib',
-            'Booties', 'Teddy Bear', 'Lullaby', 'Rocking Chair', 'Baby Powder', 'Baby Wipes', 'Burp Cloth', 'Changing Table', 'High Chair', 'Baby Monitor',
-            'Teething Ring', 'Baby Shampoo', 'Hooded Towel', 'Storybook', 'Mobile', 'Nursery', 'Swaddle', 'Formula', 'Breast Pump', 'Diaper Bag',
-            'Car Seat', 'Play Mat', 'Sippy Cup', 'Night Light', 'Baby Lotion', 'Socks', 'Mittens', 'Baby Carrier', 'Tummy Time', 'Growth Chart',
-            'Bath Time', 'Baby Food', 'Spoon', 'Bib Clip', 'Cradle', 'Baby Swing', 'Baby Walker', 'Teether', 'Plush Toy', 'Pajamas',
-            'Baby Oil', 'Nail Clippers', 'Thermometer', 'First Steps', 'Giggle', 'Yawn', 'Nap Time', 'Peekaboo', 'Lullaby Book', 'Baby Hat',
-            'Diaper Rash Cream', 'Feeding Time', 'Milestone', 'Ultrasound', 'Baby Shower', 'Stork', 'Baby Registry', 'Name Reveal', 'Mommy-to-be', 'Daddy-to-be',
-            'Gender Reveal', 'Baby Blanket', 'Cradle Cap', 'Newborn', 'Teething Gel'
-        ];
-        let bingoItem;
-        do {
-            bingoItem = babyShowerItems[Math.floor(Math.random() * babyShowerItems.length)];
-        } while (generatedNumbers.includes(bingoItem));
+        setGeneratedNumbers(prevNumbers => {
+            // Check if all items already picked
+            if (prevNumbers.length >= 75) {
+                setIsGenerating(false);
+                setShowAllPickedAlert(true);
+                return prevNumbers;
+            }
 
-        setGeneratedNumbers(prevNumbers => [...prevNumbers, bingoItem]);
+            let bingoItem;
+            let attempts = 0;
+            do {
+                bingoItem = babyShowerWords[Math.floor(Math.random() * babyShowerWords.length)];
+                attempts++;
+            } while (prevNumbers.includes(bingoItem) && attempts < 100);
+            
+            // If couldn't find new item, all items are picked
+            if (prevNumbers.includes(bingoItem) && attempts >= 100) {
+                setIsGenerating(false);
+                setShowAllPickedAlert(true);
+                return prevNumbers;
+            }
+            
+            const newNumbers = [...prevNumbers, bingoItem];
+            
+            // If just reached 75, disable button and show alert
+            if (newNumbers.length === 75) {
+                setTimeout(() => setIsGenerating(false), 500);
+                setTimeout(() => setShowAllPickedAlert(true), 500);
+            } else {
+                setIsGenerating(false);
+            }
+            
+            return newNumbers;
+        });
     };
 
     const resetNumber = () => {
@@ -97,6 +127,24 @@ const BabyShowerBingo = ({ automationCallback, isSoundEnabled, onSoundToggle }) 
 
     const handleBingoClick = () => {
         setShowOverlay(true);
+        setSortOrder(null); // Reset sort when opening modal
+    };
+
+    const handleSortAscending = () => {
+        setSortOrder(sortOrder === 'asc' ? null : 'asc');
+    };
+
+    const handleSortDescending = () => {
+        setSortOrder(sortOrder === 'desc' ? null : 'desc');
+    };
+
+    const getSortedNumbers = () => {
+        if (sortOrder === 'asc') {
+            return [...generatedNumbers].sort((a, b) => a.localeCompare(b));
+        } else if (sortOrder === 'desc') {
+            return [...generatedNumbers].sort((a, b) => b.localeCompare(a));
+        }
+        return generatedNumbers;
     };
 
     const handleVerifyWinner = () => {
@@ -108,9 +156,47 @@ const BabyShowerBingo = ({ automationCallback, isSoundEnabled, onSoundToggle }) 
 
     return (
         <>
-            <BouncingBalls isGenerating={isGenerating} />
             <PopperEffect trigger={showPopper} />
-            <div className="d-flex flex-column min-vh-100">
+            
+            {/* Fixed Pick Button */}
+            <Button 
+                id="generateButton" 
+                onClick={startGenerating} 
+                className="btn btn-danger btn-lg rounded-0 fw-light" 
+                disabled={isGenerating || generatedNumbers.length === 75}
+                style={{
+                    position: 'fixed',
+                    top: '70px',
+                    right: '1rem',
+                    zIndex: 1000,
+                    minWidth: '150px'
+                }}
+            >
+                {isGenerating ? (
+                    <>
+                        <Spinner animation="grow" size="sm" /> Picking
+                    </>
+                ) : (
+                    "Pick an Item"
+                )}
+            </Button>
+            
+            {showAllPickedAlert && (
+                <Alert 
+                    variant="warning" 
+                    className="mt-3 mx-auto" 
+                    style={{ maxWidth: '500px', width: '90%', position: 'fixed', top: '250px', left: '50%', transform: 'translateX(-50%)', zIndex: 999 }}
+                    onClose={() => setShowAllPickedAlert(false)}
+                    dismissible
+                >
+                    <Alert.Heading>All Items are Picked!</Alert.Heading>
+                    <p>
+                        Re-check your Bingo!!
+                    </p>
+                </Alert>
+            )}
+
+            <div className="d-flex flex-column" style={{ minHeight: '80vh' }}>
                 <div className="flex-grow-1 d-flex align-items-center justify-content-center">
                     <div className="container text-center">
                         <Helmet>
@@ -118,29 +204,14 @@ const BabyShowerBingo = ({ automationCallback, isSoundEnabled, onSoundToggle }) 
                         </Helmet>
                         <div className="row">
                             <div className="col">
-                                <h2 className="mb-4">Baby Shower Bingo</h2>
-                                <Button 
-                                    id="generateButton" 
-                                    onClick={startGenerating} 
-                                    className="btn btn-info btn-lg rounded-0 fw-light" 
-                                    disabled={isGenerating}
-                                >
-                                    {isGenerating ? (
-                                        <>
-                                            <Spinner animation="grow" size="sm" /> Picking
-                                        </>
-                                    ) : (
-                                        "Pick an Item"
-                                    )}
-                                </Button>
-                                <div id="bingoNumbers" className="my-5 d-flex flex-wrap justify-content-center gap-1 mt-4">
+                                <div id="bingoNumbers" className="my-5 d-flex flex-wrap justify-content-center gap-1 mt-4" style={{ paddingTop: '2rem' }}>
                                     {generatedNumbers.map((item, index) => {
-                                        const badgeClass = "bg-info text-white";
+                                        const badgeClass = "bg-primary text-white";
                                         return (
                                             <span 
                                                 key={index} 
                                                 className={`d-inline px-3 py-2 fw-light ${badgeClass} ${fadingOut ? '' : 'fade-in'}`}
-                                                style={{ borderRadius: '0.375rem' }}
+                                                style={{ borderRadius: '0.375rem', fontSize: 'clamp(0.75rem, 2vw, 1rem)' }}
                                             >
                                                 {item}
                                             </span>
@@ -168,14 +239,57 @@ const BabyShowerBingo = ({ automationCallback, isSoundEnabled, onSoundToggle }) 
                 footerButtonText="We have a Winner!"
                 footerBtnColor="success"
                 onFooterButtonClick={handleVerifyWinner}
+                fullWidth={true}
             >
-                <div style={{ textAlign: 'center' }}>
-                    {generatedNumbers.map((item, index) => (
-                        <div key={index} style={{ margin: '0.5rem 0' }}>
-                            <span className="badge bg-info text-white" style={{ padding: '0.75rem 1rem', fontSize: '1rem' }}>
-                                {item}
-                            </span>
-                        </div>
+                <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
+                    <button
+                        onClick={handleSortAscending}
+                        style={{
+                            background: sortOrder === 'asc' ? '#0d6efd' : '#f8f9fa',
+                            color: sortOrder === 'asc' ? 'white' : 'black',
+                            border: '1px solid #dee2e6',
+                            borderRadius: '0.375rem',
+                            padding: '0.25rem 0.5rem',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                            fontSize: '0.75rem',
+                            transition: 'all 0.3s ease'
+                        }}
+                        title="Sort A-Z"
+                    >
+                        <SortAlphaDown size={14} /> A-Z
+                    </button>
+                    <button
+                        onClick={handleSortDescending}
+                        style={{
+                            background: sortOrder === 'desc' ? '#0d6efd' : '#f8f9fa',
+                            color: sortOrder === 'desc' ? 'white' : 'black',
+                            border: '1px solid #dee2e6',
+                            borderRadius: '0.375rem',
+                            padding: '0.25rem 0.5rem',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                            fontSize: '0.75rem',
+                            transition: 'all 0.3s ease'
+                        }}
+                        title="Sort Z-A"
+                    >
+                        <SortAlphaUp size={14} /> Z-A
+                    </button>
+                </div>
+                <div style={{ textAlign: 'center', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.5rem', width: '100%' }}>
+                    {getSortedNumbers().map((item, index) => (
+                        <span 
+                            key={index} 
+                            className="badge bg-info text-white fw-light" 
+                            style={{ padding: '0.5rem 0.75rem', fontSize: '0.9rem' }}
+                        >
+                            {item}
+                        </span>
                     ))}
                 </div>
             </ModalOverlay>

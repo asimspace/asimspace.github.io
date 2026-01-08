@@ -116,7 +116,31 @@ const BingoGenerator = ({ automationCallback, isSoundEnabled, onSoundToggle }) =
       <>
         <BouncingBalls isGenerating={isGenerating} />
         <PopperEffect trigger={showPopper} />
-        <div className="d-flex flex-column min-vh-100">
+        
+        {/* Fixed Pick Button */}
+        <Button 
+            id="generateButton" 
+            onClick={startGenerating} 
+            className="btn btn-primary btn-lg rounded-0 fw-light" 
+            disabled={isGenerating}
+            style={{
+                position: 'fixed',
+                top: '70px',
+                right: '1rem',
+                zIndex: 1000,
+                minWidth: '150px'
+            }}
+        >
+            {isGenerating ? (
+                <>
+                    <Spinner animation="grow" size="sm" /> Picking
+                </>
+            ) : (
+                "Pick a Number"
+            )}
+        </Button>
+        
+        <div className="d-flex flex-column" style={{ minHeight: '80vh' }}>
           <div className="flex-grow-1 d-flex align-items-center justify-content-center">
             <div className="container text-center">
               <Helmet>
@@ -124,15 +148,6 @@ const BingoGenerator = ({ automationCallback, isSoundEnabled, onSoundToggle }) =
               </Helmet>
               <div className="row">
                 <div className="col">
-                  <Button id="generateButton" onClick={startGenerating} className="btn btn-primary btn-lg rounded-0 fw-light" disabled={isGenerating}>
-                      {isGenerating ? (
-                          <>
-                              <Spinner animation="grow" size="sm" /> Picking
-                          </>
-                      ) : (
-                          "Pick a Number"
-                      )}
-                  </Button>
                   <div id="bingoNumbers" className="my-5 d-flex flex-wrap justify-content-center gap-1 mt-4">
                       {generatedNumbers.map((num, index) => {
                           const badgeClass = {
@@ -162,6 +177,7 @@ const BingoGenerator = ({ automationCallback, isSoundEnabled, onSoundToggle }) =
           footerButtonText="We have a Winner!"
           footerBtnColor="success"
           onFooterButtonClick={handleVerifyWinner}
+          fullWidth={true}
         >
           <table className="table table-bordered">
             <tbody>

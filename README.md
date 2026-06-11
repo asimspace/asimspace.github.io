@@ -1,4 +1,48 @@
-# Getting Started with Create React App
+# Baby Shower Bingo
+
+A React-based Baby Shower Bingo game application.
+
+## Quick Start
+
+### Run Locally
+```bash
+npm start
+```
+- Opens [http://localhost:3000](http://localhost:3000) in your browser
+- The page auto-reloads when you make changes
+
+### Build for Production
+```bash
+npm run build
+```
+- Creates an optimized production build in the `build` folder
+- Minified and ready for deployment
+
+### Deploy to GitHub Pages
+
+#### Setup (One-time)
+```bash
+npm install gh-pages --save-dev
+```
+
+#### Deploy
+```bash
+npm run deploy
+```
+- Builds the app and deploys it to the `gh-pages` branch
+- Changes will be live at https://asimspace.github.io
+
+#### Push changes to main branch
+```bash
+git add .
+git commit -m "Your commit message"
+git push origin main
+```
+- Pushes source code to your `asimspace.github.io` repository
+
+---
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

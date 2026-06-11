@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button, Spinner, Modal } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
+import TextToSpeech from "text-to-speech-js";
 import ModalOverlay from "../components/ModalOverlay";
 import BouncingBalls from "../components/BouncingBalls";
 import PopperEffect from "../components/PopperEffect";
@@ -16,6 +17,35 @@ const BingoGenerator = ({ automationCallback, isSoundEnabled, onSoundToggle }) =
     const [showPopper, setShowPopper] = useState(false);
     const heartbeatAudioRef = useRef(new Audio('/shake.mp3'));
     const automationIntervalRef = useRef(null);
+
+    // Convert number to words
+    const numberToWords = (num) => {
+        const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+        const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen'];
+        
+        if (num < 10) return ones[num];
+        if (num < 16) return teens[num - 10];
+        return ones[Math.floor(num / 10)] + 'ty ' + (num % 10 ? ones[num % 10] : '');
+    };
+
+    // Announce bingo number using Web Speech API with fallback support
+    const announceBingoNumber = (bingoNumber) => {
+        if (!isSoundEnabled) return;
+        
+        try {
+            const letter = bingoNumber.charAt(0);
+            const number = parseInt(bingoNumber.split('-')[1]);
+            const numberInWords = numberToWords(number);
+            const announcement = `Next Number is ${letter} ${numberInWords}`;
+            
+            // Use text-to-speech-js library
+            TextToSpeech.talk({
+                text: announcement
+            });
+        } catch (error) {
+            console.error('Error announcing bingo number:', error);
+        }
+    };
 
     useEffect(() => {
         localStorage.setItem('generatedNumbers', JSON.stringify(generatedNumbers));
@@ -76,6 +106,8 @@ const BingoGenerator = ({ automationCallback, isSoundEnabled, onSoundToggle }) =
       } while (generatedNumbers.includes(bingoNumber));
 
       setGeneratedNumbers(prevNumbers => [...prevNumbers, bingoNumber]);
+      // Announce the generated bingo number
+      announceBingoNumber(bingoNumber);
     };
 
     const resetNumber = () => {
